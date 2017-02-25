@@ -6,12 +6,23 @@
 
 // Original example by Elie Zananiri
 // http://www.silentlycrashing.net
+
+
+// TODO:
+// 2. Use osc to send signal from node webpage to processing to start/save
+  //  a. Use js to remove files if save is not clicked
+  //  b. Use js to create gif / open in browser
+
+// TODO LATER:
+// 1. Reverse colors -- starts white and background fades to black
+import controlP5.*;
 import org.openkinect.freenect.*;
 import org.openkinect.processing.*;
 
 Kinect kinect;
 // Depth image
 PImage depthImg, testImg;
+ControlP5 control;
 
 // Which pixels do we care about?
 int minDepth = 0;
@@ -34,24 +45,45 @@ void setup() {
   kinect.initDepth();
   angle = kinect.getTilt();
   imgColors = new int[kinect.getRawDepth().length];
-  for(int i = 0; i < imgColors.length; i++) {
-     imgColors[i] = 255;
+  for (int i = 0; i < imgColors.length; i++) {
+    imgColors[i] = 255;
   }
   depthImg = new PImage(kinect.width, kinect.height);
   frameRate(20);
+
+  control = new ControlP5(this);
+  control.addButton("start")
+   .setValue(0)
+   .setPosition(100,100)
+   .setSize(200,19)
+   ;
+
+   control.addButton("save")
+    .setValue(0)
+    .setPosition(250,100)
+    .setSize(100,19)
+    ;
+   control.setAutoDraw(false);
 }
 
+public void start() {
+  println("START THIS");
+  startCountdown();
+}
+
+public void save() {
+  println("SAVE IT");
+}
 
 void draw() {
-  if(isCountingDown) {
+  if (isCountingDown) {
     displayCountdown();
-  }
-  else if(isCapturing) {
-     //Threshold the depth image
+  } else if (isCapturing) {
+    //Threshold the depth image
     int[] rawDepth = kinect.getRawDepth();
     for (int i=0; i < rawDepth.length; i++) {
       if (rawDepth[i] >= minDepth && rawDepth[i] <= maxDepth) {
-        if(imgColors[i] > 0) {
+        if (imgColors[i] > 0) {
           imgColors[i] -= 5;
         }
         depthImg.pixels[i] = color(imgColors[i]);
@@ -59,7 +91,7 @@ void draw() {
       }
     }
 
-     //Draw the thresholded image
+    //Draw the thresholded image
     depthImg.updatePixels();
     image(depthImg, 0, 0);
 
@@ -67,14 +99,15 @@ void draw() {
     //text("TILT: " + angle, 10, 20);
     //text("THRESHOLD: [" + minDepth + ", " + maxDepth + "]", 10, 36);
     counter++;
-    if(counter > 100) {
+    if (counter > 100) {
       println("DONE!!!");
       isCapturing = false;
     }
 
     saveImage();
-  }
-  else {
+  } else {
+    // Draw the controls
+    control.draw();
   }
 }
 
@@ -82,12 +115,11 @@ void draw() {
 void keyPressed() {
   if (key == 'c' && !isCapturing && !isCountingDown) {
     startCountdown();
-
   }
 }
 
 // Create gif from command line:
-   // convert -loop 0 *.jpg myimage.gif
+// convert -loop 0 *.jpg myimage.gif
 void saveImage() {
   String path = savePath(gifCounter + "/angel" + "_" + String.format ("%05d", frameCounter) + ".jpg");
   frameCounter++;
@@ -99,10 +131,10 @@ void resetImage() {
   counter = 0;
   gifCounter++;
   frameCounter = 0;
-  for(int i = 0; i < imgColors.length; i++) {
-     imgColors[i] = 255;
-     depthImg.pixels[i] = color(imgColors[i]);
-     depthImg.updatePixels();
+  for (int i = 0; i < imgColors.length; i++) {
+    imgColors[i] = 255;
+    depthImg.pixels[i] = color(imgColors[i]);
+    depthImg.updatePixels();
   }
 }
 
@@ -116,16 +148,14 @@ void displayCountdown() {
   int elapsed = frameCount - countdownStart;
   fill(0, 102, 153);
   textSize(32);
-  if(elapsed < 21) {
+  if (elapsed < 21) {
     text("3", 10, 30);
-  }
-  else if(elapsed < 41) {
+  } else if (elapsed < 41) {
     text("2", 10, 30);
-  }
-  else if(elapsed < 61) {
+  } else if (elapsed < 61) {
     text("1", 10, 30);
-  }
-  else {
+  } else {
+    background(255);
     isCountingDown = false;
     resetImage();
     isCapturing = true;
