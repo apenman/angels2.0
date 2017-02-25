@@ -23,6 +23,9 @@ int frameCounter = 0;
 // What is the kinect's angle
 float angle;
 boolean isCapturing = false;
+boolean isCountingDown = false;
+int countDownBuffer = 20;
+int countdownStart = 0;
 
 void setup() {
   size(800, 640);
@@ -40,7 +43,10 @@ void setup() {
 
 
 void draw() {
-  if(isCapturing) {
+  if(isCountingDown) {
+    displayCountdown();
+  }
+  else if(isCapturing) {
      //Threshold the depth image
     int[] rawDepth = kinect.getRawDepth();
     for (int i=0; i < rawDepth.length; i++) {
@@ -74,9 +80,9 @@ void draw() {
 
 // Adjust the angle and the depth threshold min and max
 void keyPressed() {
-  if (key == 'c' && !isCapturing) {
-    resetImage();
-    isCapturing = true;
+  if (key == 'c' && !isCapturing && !isCountingDown) {
+    startCountdown();
+
   }
 }
 
@@ -97,5 +103,31 @@ void resetImage() {
      imgColors[i] = 255;
      depthImg.pixels[i] = color(imgColors[i]);
      depthImg.updatePixels();
+  }
+}
+
+void startCountdown() {
+  countdownStart = frameCount;
+  isCountingDown = true;
+}
+
+void displayCountdown() {
+  background(255);
+  int elapsed = frameCount - countdownStart;
+  fill(0, 102, 153);
+  textSize(32);
+  if(elapsed < 21) {
+    text("3", 10, 30);
+  }
+  else if(elapsed < 41) {
+    text("2", 10, 30);
+  }
+  else if(elapsed < 61) {
+    text("1", 10, 30);
+  }
+  else {
+    isCountingDown = false;
+    resetImage();
+    isCapturing = true;
   }
 }
