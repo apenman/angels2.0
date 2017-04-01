@@ -9,6 +9,7 @@
 
 
 // TODO:
+// 1. Clean up code
 // 2. Use osc to send signal from node webpage to processing to start/save
   //  a. Use js to remove files if save is not clicked
   //  b. Use js to create gif / open in browser
@@ -40,7 +41,7 @@ int countdownStart = 0;
 
 void setup() {
   size(800, 640);
-
+  
   kinect = new Kinect(this);
   kinect.initDepth();
   angle = kinect.getTilt();
@@ -51,21 +52,20 @@ void setup() {
   depthImg = new PImage(kinect.width, kinect.height);
   frameRate(20);
 
+  // Set up controls
   control = new ControlP5(this);
   control.addButton("start")
    .setValue(0)
    .setPosition(100,100)
-   .setSize(200,19)
-   ;
-
+   .setSize(100,19);
    control.addButton("save")
     .setValue(0)
     .setPosition(250,100)
-    .setSize(100,19)
-    ;
+    .setSize(100,19);
    control.setAutoDraw(false);
 }
 
+// Button listeners
 public void start() {
   println("START THIS");
   startCountdown();
