@@ -1,3 +1,9 @@
+import netP5.*;
+import oscP5.*;
+import controlP5.*;
+import org.openkinect.freenect.*;
+import org.openkinect.processing.*;
+
 // Daniel Shiffman
 // Depth thresholding example
 
@@ -16,9 +22,6 @@
 
 // TODO LATER:
 // 1. Reverse colors -- starts white and background fades to black
-import controlP5.*;
-import org.openkinect.freenect.*;
-import org.openkinect.processing.*;
 
 Kinect kinect;
 // Depth image
